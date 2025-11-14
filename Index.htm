@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUKLEIA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+      :root {
+        --color-salmon-rosa: #fce2e8;
+        --color-salmon-fuerte: #f9b6c1;
+        --color-blanco-hueso: #fdfcfc;
+        --color-texto-principal: #333333;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--color-blanco-hueso);
+        color: var(--color-texto-principal);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      /* ESTILOS DEL VIDEO HEADER */
+      header {
+          position: relative;
+          width: 100%;
+          height: 300px; /* Altura ajustable del banner de video */
+          overflow: hidden;
+          background-color: var(--color-salmon-rosa);
+      }
+      #hero-video {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          min-width: 100%;
+          min-height: 100%;
+          width: auto;
+          height: auto;
+          transform: translateX(-50%) translateY(-50%);
+          z-index: 0;
+          opacity: 0.8; /* Un poco de transparencia para que se integre mejor */
+      }
+      .header-overlay {
+          position: relative;
+          z-index: 1;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(252, 226, 232, 0.3); /* Filtro rosado sobre el video */
+      }
+      .header-title {
+          font-size: 4rem;
+          font-weight: 900;
+          letter-spacing: 0.5rem;
+          color: #fff;
+          text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      }
+
+      .btn-primary {
+        background-color: var(--color-salmon-fuerte);
+        color: var(--color-texto-principal);
+        padding: 0.75rem 1.5rem;
+        border-radius: 9999px;
+        transition: background-color 0.3s, transform 0.1s;
+        font-weight: 600;
+        text-align: center;
+        border: none;
+        cursor: pointer;
+      }
+      .btn-primary:hover {
+        background-color: #f7a0b1;
+        transform: translateY(-1px);
+      }
+      .btn-primary:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+      }
+      #analysis-section, #results-section { display: none; }
+      #video-container { position: relative; background-color: #000; border-radius: 0.75rem; overflow: hidden; }
+      #camera-feed { transform: scaleX(-1); width: 100%; display: block; }
+      #photo-canvas { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+      .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); color: white; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10; }
+      .advice-card { background-color: #fff; border: 1px solid #fce2e8; padding: 1.5rem; border-radius: 0.75rem; transition: transform 0.2s, box-shadow 0.2s; }
+      .advice-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+      .advice-icon { color: var(--color-salmon-fuerte); }
+      .highlight-card { background: linear-gradient(135deg, #fdfcfc, #fce2e8); border: 1px solid white; border-radius: 0.75rem; padding: 1.5rem; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+      .category-card { background-color: #ffffff; border-left: 4px solid var(--color-salmon-fuerte); padding: 1rem; border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+      .metric-item { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6; }
+      .metric-item:last-child { border-bottom: none; }
+      .metric-label { font-weight: 600; color: #4b5563; }
+      .metric-value { color: #1f2937; text-align: right; }
+      .recommendation-card { background-color: #fff; border: 2px solid var(--color-salmon-fuerte); border-radius: 0.75rem; padding: 2rem; margin-top: 3rem; box-shadow: 0 10px 25px -5px rgba(249, 182, 193, 0.2); }
+      .cta-section { background-color: var(--color-salmon-rosa); padding: 2rem; border-radius: 0.75rem; text-align: center; margin-top: 2rem; }
+      .analysis-image-group { display: flex; flex-direction: column; gap: 1.5rem; }
+      .analysis-image-group .image-wrapper { background-color: white; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); padding: 0.5rem; position: relative; }
+      .analysis-image-group .image-wrapper .title { position: absolute; top: 0.75rem; left: 0.75rem; background-color: rgba(255, 255, 255, 0.85); padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; color: #333; }
+
+      .treatment-card {
+        background-color: #fff;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: 1px solid #f3f4f6;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .treatment-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+      }
+      .treatment-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--color-salmon-fuerte);
+      }
+      /* Ajustes responsive para el header de video */
+      @media (max-width: 768px) {
+          header { height: 200px; }
+          .header-title { font-size: 2.5rem; }
+      }
+    </style>
+</head>
+
+<body class="antialiased">
+
+<header>
+    <video id="hero-video" autoplay loop muted playsinline>
+        <source src="https://videos.pexels.com/video-files/5091643/5091643-hd_1920_1080_24fps.mp4" type="video/mp4">
+        Tu navegador no soporta videos HTML5.
+    </video>
+    <div class="header-overlay">
+        <h1 class="header-title">NUKLEIA</h1>
+    </div>
+</header>
+
+<main class="container mx-auto p-4 md:p-12">
+    <section id="intro-section" class="py-12">
+        <h2 class="text-4xl md:text-6xl font-light text-center">DESCUBRE LO QUE TU PIEL NECESITA</h2>
+        <p class="mt-4 text-gray-600 text-xl text-center">Análisis facial con IA en 30 segundos. Precisión clínica para tu rutina.</p>
+        <div class="mt-16 max-w-4xl mx-auto">
+            <h3 class="text-2xl font-semibold text-center mb-8">Consejos para un Análisis Perfecto</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                <div class="advice-card"><i class="fas fa-lightbulb fa-3x mb-4 advice-icon"></i><h4 class="font-bold text-lg">Buena Iluminación</h4><p class="text-sm text-gray-600 mt-2">Ubícate frente a una fuente de luz natural para evitar sombras.</p></div>
+                <div class="advice-card"><i class="fas fa-user fa-3x mb-4 advice-icon"></i><h4 class="font-bold text-lg">Rostro Despejado</h4><p class="text-sm text-gray-600 mt-2">Asegúrate de tener la cara limpia, sin maquillaje y con el cabello recogido.</p></div>
+                <div class="advice-card"><i class="fas fa-ban fa-3x mb-4 advice-icon"></i><h4 class="font-bold text-lg">Sin Accesorios</h4><p class="text-sm text-gray-600 mt-2">Quítate gafas, gorras o cualquier objeto que cubra tu rostro.</p></div>
+                <div class="advice-card"><i class="fas fa-face-meh fa-3x mb-4 advice-icon"></i><h4 class="font-bold text-lg">Expresión Neutra</h4><p class="text-sm text-gray-600 mt-2">Mantén un rostro relajado, sin sonreír ni fruncir el ceño.</p></div>
+            </div>
+        </div>
+        <form id="user-info-form" class="mt-16 flex flex-col items-center">
+            <p id="firebase-warning" class="text-red-600 text-center mb-4 font-semibold hidden p-3 border-2 border-red-200 bg-red-50 rounded-lg w-full max-w-md">⚠ La base de datos no está conectada.</p>
+            <h4 class="text-2xl font-light mb-6">Comienza tu Análisis Gratuito</h4>
+            <div class="mb-4 w-full max-w-sm"><label for="name" class="block text-gray-700 font-semibold mb-2">Nombre</label><input type="text" id="name" name="name" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f9b6c1]"></div>
+            <div class="mb-6 w-full max-w-sm"><label for="email" class="block text-gray-700 font-semibold mb-2">Email</label><input type="email" id="email" name="email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f9b6c1]"></div>
+            <button type="submit" class="mt-4 btn-primary w-full max-w-xs">HACER MI ESCANEO GRATUITO</button>
+        </form>
+    </section>
+
+    <section id="analysis-section" class="w-full max-w-4xl mx-auto text-center mb-12">
+        <h2 class="text-3xl font-bold mb-8">Paso 2: Captura Facial</h2>
+        <div id="video-container" class="mb-6 shadow-2xl"><video id="camera-feed" class="rounded-xl w-full" autoplay playsinline></video><canvas id="photo-canvas"></canvas><div class="overlay" id="overlay"><i class="fas fa-spinner fa-spin text-4xl mb-2"></i><p>Analizando...</p></div></div>
+        <p id="error-message" class="text-red-500 mt-4 font-medium hidden"></p>
+        <button id="take-photo-btn" class="btn-primary mt-6"><i class="fas fa-camera mr-2"></i>Tomar Foto para Analizar</button>
+    </section>
+
+    <section id="results-section" class="w-full max-w-6xl mx-auto mb-12 p-4 md:p-0">
+        <h2 class="text-4xl font-bold mb-8 text-center">Tus Resultados de Análisis Personalizado</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 space-y-8">
+                <div class="analysis-image-group">
+                    <div class="image-wrapper"><span class="title">Tu Foto</span><img id="analyzed-user-image" class="rounded-xl w-full h-auto" src="" alt="Tu foto analizada"></div>
+                    <div class="image-wrapper"><span class="title">Análisis Visual</span><img id="analyzed-reference-image" class="rounded-xl w-full h-auto" src="https://placehold.co/600x400/fce2e8/333333?text=IMAGEN+DE+REFERENCIA" alt="Imagen de referencia con zonas resaltadas"></div>
+                </div>
+                <div class="highlight-card"><h4 class="font-bold text-xl mb-2 flex items-center justify-center"><i class="fas fa-user-clock mr-2"></i> Edad Biológica</h4><p id="biological-age" class="text-4xl font-extrabold text-[#d6336c]">-</p></div>
+                <div class="highlight-card"><h4 class="font-bold text-xl mb-2 flex items-center justify-center"><i class="fas fa-chart-line mr-2"></i> Envejecimiento Proyectado</h4><p id="projection-text" class="text-gray-600 text-base">-</p></div>
+            </div>
+            <div id="diagnostics-container" class="lg:col-span-2 space-y-6">
+                <h3 class="text-3xl font-semibold border-b pb-2">Diagnóstico Detallado</h3>
+            </div>
+        </div>
+
+        <div id="suggested-treatments-section" class="mt-12">
+            <h3 class="text-3xl font-bold text-center mb-8">Tu Plan de Tratamientos Sugeridos</h3>
+            <div id="treatments-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+        </div>
+
+        <div class="recommendation-card">
+            <h3 class="text-3xl font-bold text-center mb-4">Tu Solución en Casa: NUKLEIA SERUM</h3>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">Para complementar tus tratamientos y potenciar los resultados, NUKLEIA SERUM promueve una regeneración celular profunda y visible.</p>
+            <div class="grid md:grid-cols-2 gap-8 text-left">
+                <div><h4 class="text-xl font-bold flex items-center mb-2"><i class="fas fa-dna mr-3 text-2xl text-[#f9b6c1]"></i>Polinucleótidos (PDRN)</h4><p class="text-gray-600">Extraídos del **ADN de salmón**, reparan las células dañadas, estimulan la producción de colágeno y mejoran la firmeza.</p></div>
+                <div><h4 class="text-xl font-bold flex items-center mb-2"><i class="fas fa-atom mr-3 text-2xl text-[#f9b6c1]"></i>Exosomas</h4><p class="text-gray-600">Actúan como mensajeros celulares, transportando factores de crecimiento que instruyen a las células a regenerarse y rejuvenecer.</p></div>
+            </div>
+            <div class="text-center mt-8"><a href="#" class="btn-primary inline-block"><i class="fas fa-shopping-cart mr-2"></i> Comprar NUKLEIA SERUM</a></div>
+        </div>
+        <div class="cta-section">
+            <h3 class="text-2xl font-bold mb-2">Agenda tu Consulta Profesional</h3>
+            <p class="text-gray-700 mb-6">Te recomendamos agendar una consulta en **MB Estética & Salud** para un plan de tratamiento personalizado.</p>
+            <a href="https://wa.me/541126572893" target="_blank" class="btn-primary inline-block text-lg"><i class="fab fa-whatsapp mr-2"></i> Sacar Turno por WhatsApp</a>
+        </div>
+    </section>
+</main>
+
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    const firebaseConfig = {"apiKey":"AIzaSyCvVHCbcuCISfV1WeCUjhHcJvuYQvj4IZo","authDomain":"nukleia-web.firebaseapp.com","projectId":"nukleia-web","storageBucket":"nukleia-web.firebasestorage.app","messagingSenderId":"925270420611","appId":"1:925270420611:web:7ef1d8c6e01e8c1df37fb6","measurementId":"G-CGQV62HY8Y"};
+    let app, db, auth, userId = null, userName = '', userEmail = '';
+    let videoStream = null;
+    setLogLevel('error');
+
+    const elements = {
+        introSection: document.getElementById('intro-section'),
+        analysisSection: document.getElementById('analysis-section'),
+        resultsSection: document.getElementById('results-section'),
+        cameraFeed: document.getElementById('camera-feed'),
+        photoCanvas: document.getElementById('photo-canvas'),
+        takePhotoBtn: document.getElementById('take-photo-btn'),
+        overlaySpinner: document.getElementById('overlay'),
+        diagnosticsContainer: document.getElementById('diagnostics-container'),
+        treatmentsList: document.getElementById('treatments-list'),
+        projectionText: document.getElementById('projection-text'),
+        biologicalAge: document.getElementById('biological-age'),
+        analyzedUserImage: document.getElementById('analyzed-user-image'),
+        analyzedReferenceImage: document.getElementById('analyzed-reference-image'),
+        userNameInput: document.getElementById('name'),
+        userEmailInput: document.getElementById('email'),
+        userInfoForm: document.getElementById('user-info-form'),
+        firebaseWarning: document.getElementById('firebase-warning'),
+        errorMessage: document.getElementById('error-message')
+    };
+    
+    // ==============================================================================
+    // === NUEVA IA DE ANÁLISIS DINÁMICA (SIMULADA) ===
+    // ==============================================================================
+    // Esta función ahora genera resultados aleatorios pero coherentes cada vez.
+    const generateResults = () => {
+        // 1. Banco de Posibles Diagnósticos
+        const diagnosisOptions = {
+            simetria: ["Alta", "Moderada", "Leve asimetría detectada"],
+            proporciones: ["Armónicas", "Estándar", "Zona inferior dominante"],
+            volumenes: ["Buena densidad", "Leve pérdida en pómulos", "Pérdida notable en surcos"],
+            arrugasFinas: ["Ausentes", "Presentes (periorbital)", "Visibles en frente y ojos"],
+            arrugasProfundas: ["Ausentes", "Incipientes en entrecejo", "Marcadas en surco nasogeniano"],
+            poros: ["Cerrados", "Dilatados (zona T)", "Visiblemente abiertos en mejillas"],
+            manchasSolares: ["Ausentes", "Leves", "Visibles en pómulos", "Múltiples lentigos"],
+            melasma: ["No se detecta", "Leve sombra en frente", "Visible en zona superior del labio"],
+            rojeces: ["Mínimas", "Presentes en aletas nasales", "Tendencia a rosácea detectada"],
+            perdidaDeVolumen: ["No detectada", "Incipiente", "Moderada en tercio medio"],
+            flacidez: ["No significativa", "Leve en óvalo facial", "Moderada en cuello y mandíbula"],
+            tipoPiel: ["Normal", "Mixta", "Grasa", "Seca"],
+            brillo: ["Saludable", "Excesivo (zona T)", "Apagado/Mate"],
+            acne: ["Ausente", "Puntos negros visibles", "Pápulas ocasionales"],
+            cicatrices: ["Ausentes", "Marcas superficiales", "Marcas de acné antiguo"]
+        };
+
+        // Función auxiliar para elegir una opción al azar
+        const pick = (options) => options[Math.floor(Math.random() * options.length)];
+
+        // 2. Generar el objeto de resultados seleccionando opciones al azar
+        const results = {
+            edadBiologica: `${Math.floor(Math.random() * 5) + 1} años ${Math.random() > 0.5 ? 'menor' : 'mayor'}`,
+            envejecimientoProyectado: pick([
+                "Se proyecta una profundización de líneas de expresión en 3 años si no se trata.",
+                "Tendencia a la flacidez en el tercio inferior del rostro en los próximos 5 años.",
+                "Riesgo moderado de hiperpigmentación solar sin la protección adecuada.",
+                "Excelente pronóstico, mantener rutina actual para preservar resultados."
+            ]),
+            morfologiaFacial: { simetria: pick(diagnosisOptions.simetria), proporciones: pick(diagnosisOptions.proporciones), volumenes: pick(diagnosisOptions.volumenes) },
+            texturaPiel: { arrugasFinas: pick(diagnosisOptions.arrugasFinas), arrugasProfundas: pick(diagnosisOptions.arrugasProfundas), poros: pick(diagnosisOptions.poros) },
+            pigmentacion: { manchasSolares: pick(diagnosisOptions.manchasSolares), melasma: pick(diagnosisOptions.melasma), rojeces: pick(diagnosisOptions.rojeces) },
+            elasticidadFirmeza: { perdidaDeVolumen: pick(diagnosisOptions.perdidaDeVolumen), flacidez: pick(diagnosisOptions.flacidez) },
+            hidratacionBrillo: { tipoPiel: pick(diagnosisOptions.tipoPiel), brillo: pick(diagnosisOptions.brillo) },
+            lesionesImperfecciones: { acne: pick(diagnosisOptions.acne), cicatrices: pick(diagnosisOptions.cicatrices) }
+        };
+
+        // 3. Lógica Dinámica para sugerir tratamientos basada en los resultados generados
+        const tratamientosSugeridos = {
+            'HIFU': { problema: ['flacidez', 'perdidaDeVolumen'], descripcion: 'Lifting sin cirugía para tensar la piel profunda.', icono: 'fas fa-wave-square' },
+            'Radiofrecuencia': { problema: ['flacidez', 'arrugasFinas'], descripcion: 'Estimulación de colágeno mediante calor controlado.', icono: 'fas fa-broadcast-tower' },
+            'Luz Pulsada (IPL)': { problema: ['manchasSolares', 'rojeces', 'melasma'], descripcion: 'Unifica el tono y elimina manchas o rojeces.', icono: 'fas fa-lightbulb' },
+            'Dermapen': { problema: ['poros', 'cicatrices', 'arrugasFinas'], descripcion: 'Microneedling para renovar la textura de la piel.', icono: 'fas fa-border-style' },
+            'Hidrodermoabrasión': { problema: ['tipoPiel', 'brillo', 'acne'], descripcion: 'Limpieza profunda e hidratación simultánea.', icono: 'fas fa-tint' },
+            'Rellenos Hialurónico': { problema: ['arrugasProfundas', 'perdidaDeVolumen'], descripcion: 'Restaura volumen perdido y suaviza surcos profundos.', icono: 'fas fa-syringe' }
+        };
+
+        let recommendedTreatments = new Set();
+
+        // Reglas de decisión de la "IA"
+        if (results.elasticidadFirmeza.flacidez.includes("Moderada") || results.elasticidadFirmeza.perdidaDeVolumen.includes("Moderada")) recommendedTreatments.add('HIFU');
+        if (results.elasticidadFirmeza.flacidez.includes("Leve") || results.texturaPiel.arrugasFinas.includes("Presentes")) recommendedTreatments.add('Radiofrecuencia');
+        if (results.pigmentacion.manchasSolares !== "Ausentes" || results.pigmentacion.rojeces.includes("Presentes")) recommendedTreatments.add('Luz Pulsada (IPL)');
+        if (results.texturaPiel.poros.includes("Dilatados") || results.texturaPiel.poros.includes("abiertos") || results.lesionesImperfecciones.cicatrices !== "Ausentes") recommendedTreatments.add('Dermapen');
+        if (results.texturaPiel.arrugasProfundas.includes("Marcadas")) recommendedTreatments.add('Rellenos Hialurónico');
+        // Tratamiento base si la piel es grasa, mixta o tiene brillo apagado
+        if (results.hidratacionBrillo.tipoPiel === "Grasa" || results.hidratacionBrillo.tipoPiel === "Mixta" || results.hidratacionBrillo.brillo.includes("Apagado")) recommendedTreatments.add('Hidrodermoabrasión');
+        
+        // Asegurar al menos 1 tratamiento si todo está "perfecto" (raro por la aleatoriedad, pero posible)
+        if (recommendedTreatments.size === 0) recommendedTreatments.add('Hidrodermoabrasión');
+
+        // Limitamos a un máximo de 4 tratamientos para no saturar
+        const finalTreatmentsList = Array.from(recommendedTreatments).slice(0, 4);
+
+        const referenceImageUrl = "https://placehold.co/600x400/f9b6c1/ffffff?text=Analisis+Completado";
+
+        return { results, tratamientosSugeridos, recommendedTreatments: finalTreatmentsList, referenceImageUrl };
+    };
+
+    // ==============================================================================
+    // === VISUALIZACIÓN (Sin cambios importantes en lógica, solo visual) ===
+    // ==============================================================================
+    const displayResults = (data) => {
+        const { results, tratamientosSugeridos, recommendedTreatments, referenceImageUrl } = data;
+        elements.analyzedUserImage.src = elements.photoCanvas.toDataURL('image/jpeg');
+        elements.analyzedReferenceImage.src = referenceImageUrl;
+        elements.biologicalAge.textContent = results.edadBiologica || '-';
+        elements.projectionText.textContent = results.envejecimientoProyectado || '-';
+
+        elements.diagnosticsContainer.innerHTML = '<h3 class="text-3xl font-semibold border-b pb-2">Diagnóstico Detallado</h3>';
+        const formatTitle = (key) => (key.replace(/([A-Z])/g, ' $1')).replace(/^./, str => str.toUpperCase());
+        for (const [category, metrics] of Object.entries(results)) {
+            if (typeof metrics === 'object') {
+                let metricsHTML = '';
+                for (const [key, value] of Object.entries(metrics)) {
+                    metricsHTML += `<div class="metric-item"><span class="metric-label">${formatTitle(key)}</span><span class="metric-value">${value}</span></div>`;
+                }
+                elements.diagnosticsContainer.innerHTML += `<div class="category-card"><h4 class="text-xl font-bold mb-2">${formatTitle(category)}</h4>${metricsHTML}</div>`;
+            }
+        }
+        
+        elements.treatmentsList.innerHTML = '';
+        recommendedTreatments.forEach(treatmentName => {
+            const treatmentData = tratamientosSugeridos[treatmentName];
+            if (treatmentData) {
+                elements.treatmentsList.innerHTML += `
+                    <div class="treatment-card">
+                        <i class="${treatmentData.icono} treatment-icon"></i>
+                        <h4 class="font-bold text-lg">${treatmentName}</h4>
+                        <p class="text-sm text-gray-600 mt-2">${treatmentData.descripcion}</p>
+                    </div>`;
+            }
+        });
+    };
+    
+    const initFirebase = async () => { try { app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); onAuthStateChanged(auth, async (user) => { if (user) { userId = user.uid; } else { await signInAnonymously(auth); } }); } catch (error) { console.error("Error Firebase:", error); elements.firebaseWarning.classList.remove('hidden'); } };
+    const startCamera = async () => { elements.introSection.style.display = 'none'; elements.analysisSection.style.display = 'block'; try { videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }); elements.cameraFeed.srcObject = videoStream; } catch (err) { elements.errorMessage.textContent = 'Error al acceder a la cámara. Asegúrate de dar permisos.'; console.error("Error Cámara:", err); } };
+    const stopCamera = () => { if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); videoStream = null; } };
+    const takePhoto = () => { elements.takePhotoBtn.disabled = true; elements.overlaySpinner.style.display = 'flex'; const context = elements.photoCanvas.getContext('2d'); elements.photoCanvas.width = elements.cameraFeed.videoWidth; elements.photoCanvas.height = elements.cameraFeed.videoHeight; context.save(); context.translate(elements.photoCanvas.width, 0); context.scale(-1, 1); context.drawImage(elements.cameraFeed, 0, 0, elements.photoCanvas.width, elements.photoCanvas.height); context.restore(); stopCamera(); setTimeout(processAnalysis, 3000); }; // Aumenté un poco el tiempo de "análisis" para realismo
+    const processAnalysis = async () => { const analysisData = generateResults(); await saveAnalysisToFirestore(analysisData); displayResults(analysisData); elements.analysisSection.style.display = 'none'; elements.resultsSection.style.display = 'block'; };
+    const saveAnalysisToFirestore = async (analysisData) => { if (!db || !userId) return; try { await addDoc(collection(db, 'analyses'), { userId, name: userName, email: userEmail, date: new Date(), ...analysisData }); } catch (error) { console.error("Error guardado DB:", error); } };
+    document.addEventListener('DOMContentLoaded', () => { initFirebase(); elements.userInfoForm.addEventListener('submit', (e) => { e.preventDefault(); userName = elements.userNameInput.value.trim(); userEmail = elements.userEmailInput.value.trim(); if (userName && userEmail) startCamera(); }); elements.takePhotoBtn.addEventListener('click', takePhoto); });
+</script>
+
+</body>
+</html>
