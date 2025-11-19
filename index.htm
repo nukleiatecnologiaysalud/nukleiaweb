@@ -22,26 +22,27 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
       }
-      /* ESTILOS DEL VIDEO HEADER */
+      
+      /* --- ESTILOS DEL VIDEO HEADER ACTUALIZADOS --- */
       header {
           position: relative;
           width: 100%;
-          height: 300px; /* Altura ajustable del banner de video */
+          height: 300px; /* Altura controlada para escritorio */
           overflow: hidden;
           background-color: var(--color-salmon-rosa);
       }
+      
       #hero-video {
           position: absolute;
-          top: 50%;
-          left: 50%;
-          min-width: 100%;
-          min-height: 100%;
-          width: auto;
-          height: auto;
-          transform: translateX(-50%) translateY(-50%);
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover; /* Clave: adapta el video sin deformarlo */
           z-index: 0;
-          opacity: 0.8; /* Un poco de transparencia para que se integre mejor */
+          opacity: 0.9; /* Ligera transparencia para que se funda bien */
       }
+
       .header-overlay {
           position: relative;
           z-index: 1;
@@ -49,8 +50,9 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          background: rgba(252, 226, 232, 0.3); /* Filtro rosado sobre el video */
+          background: rgba(252, 226, 232, 0.2); /* Filtro sutil rosado */
       }
+      
       .header-title {
           font-size: 4rem;
           font-weight: 900;
@@ -58,6 +60,7 @@
           color: #fff;
           text-shadow: 0 2px 10px rgba(0,0,0,0.2);
       }
+      /* --------------------------------------------- */
 
       .btn-primary {
         background-color: var(--color-salmon-fuerte);
@@ -116,9 +119,10 @@
         margin-bottom: 1rem;
         color: var(--color-salmon-fuerte);
       }
+      
       /* Ajustes responsive para el header de video */
       @media (max-width: 768px) {
-          header { height: 200px; }
+          header { height: 200px; /* Altura reducida en móviles */ }
           .header-title { font-size: 2.5rem; }
       }
     </style>
@@ -128,7 +132,7 @@
 
 <header>
     <video id="hero-video" autoplay loop muted playsinline>
-        <source src="https://videos.pexels.com/video-files/5091643/5091643-hd_1920_1080_24fps.mp4" type="video/mp4">
+        <source src="nukleiapresentacion.mp4" type="video/mp4">
         Tu navegador no soporta videos HTML5.
     </video>
     <div class="header-overlay">
@@ -238,9 +242,7 @@
     // ==============================================================================
     // === NUEVA IA DE ANÁLISIS DINÁMICA (SIMULADA) ===
     // ==============================================================================
-    // Esta función ahora genera resultados aleatorios pero coherentes cada vez.
     const generateResults = () => {
-        // 1. Banco de Posibles Diagnósticos
         const diagnosisOptions = {
             simetria: ["Alta", "Moderada", "Leve asimetría detectada"],
             proporciones: ["Armónicas", "Estándar", "Zona inferior dominante"],
@@ -259,10 +261,8 @@
             cicatrices: ["Ausentes", "Marcas superficiales", "Marcas de acné antiguo"]
         };
 
-        // Función auxiliar para elegir una opción al azar
         const pick = (options) => options[Math.floor(Math.random() * options.length)];
 
-        // 2. Generar el objeto de resultados seleccionando opciones al azar
         const results = {
             edadBiologica: `${Math.floor(Math.random() * 5) + 1} años ${Math.random() > 0.5 ? 'menor' : 'mayor'}`,
             envejecimientoProyectado: pick([
@@ -279,7 +279,6 @@
             lesionesImperfecciones: { acne: pick(diagnosisOptions.acne), cicatrices: pick(diagnosisOptions.cicatrices) }
         };
 
-        // 3. Lógica Dinámica para sugerir tratamientos basada en los resultados generados
         const tratamientosSugeridos = {
             'HIFU': { problema: ['flacidez', 'perdidaDeVolumen'], descripcion: 'Lifting sin cirugía para tensar la piel profunda.', icono: 'fas fa-wave-square' },
             'Radiofrecuencia': { problema: ['flacidez', 'arrugasFinas'], descripcion: 'Estimulación de colágeno mediante calor controlado.', icono: 'fas fa-broadcast-tower' },
@@ -291,19 +290,15 @@
 
         let recommendedTreatments = new Set();
 
-        // Reglas de decisión de la "IA"
         if (results.elasticidadFirmeza.flacidez.includes("Moderada") || results.elasticidadFirmeza.perdidaDeVolumen.includes("Moderada")) recommendedTreatments.add('HIFU');
         if (results.elasticidadFirmeza.flacidez.includes("Leve") || results.texturaPiel.arrugasFinas.includes("Presentes")) recommendedTreatments.add('Radiofrecuencia');
         if (results.pigmentacion.manchasSolares !== "Ausentes" || results.pigmentacion.rojeces.includes("Presentes")) recommendedTreatments.add('Luz Pulsada (IPL)');
         if (results.texturaPiel.poros.includes("Dilatados") || results.texturaPiel.poros.includes("abiertos") || results.lesionesImperfecciones.cicatrices !== "Ausentes") recommendedTreatments.add('Dermapen');
         if (results.texturaPiel.arrugasProfundas.includes("Marcadas")) recommendedTreatments.add('Rellenos Hialurónico');
-        // Tratamiento base si la piel es grasa, mixta o tiene brillo apagado
         if (results.hidratacionBrillo.tipoPiel === "Grasa" || results.hidratacionBrillo.tipoPiel === "Mixta" || results.hidratacionBrillo.brillo.includes("Apagado")) recommendedTreatments.add('Hidrodermoabrasión');
         
-        // Asegurar al menos 1 tratamiento si todo está "perfecto" (raro por la aleatoriedad, pero posible)
         if (recommendedTreatments.size === 0) recommendedTreatments.add('Hidrodermoabrasión');
 
-        // Limitamos a un máximo de 4 tratamientos para no saturar
         const finalTreatmentsList = Array.from(recommendedTreatments).slice(0, 4);
 
         const referenceImageUrl = "https://placehold.co/600x400/f9b6c1/ffffff?text=Analisis+Completado";
@@ -312,7 +307,7 @@
     };
 
     // ==============================================================================
-    // === VISUALIZACIÓN (Sin cambios importantes en lógica, solo visual) ===
+    // === VISUALIZACIÓN ===
     // ==============================================================================
     const displayResults = (data) => {
         const { results, tratamientosSugeridos, recommendedTreatments, referenceImageUrl } = data;
@@ -350,7 +345,7 @@
     const initFirebase = async () => { try { app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); onAuthStateChanged(auth, async (user) => { if (user) { userId = user.uid; } else { await signInAnonymously(auth); } }); } catch (error) { console.error("Error Firebase:", error); elements.firebaseWarning.classList.remove('hidden'); } };
     const startCamera = async () => { elements.introSection.style.display = 'none'; elements.analysisSection.style.display = 'block'; try { videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }); elements.cameraFeed.srcObject = videoStream; } catch (err) { elements.errorMessage.textContent = 'Error al acceder a la cámara. Asegúrate de dar permisos.'; console.error("Error Cámara:", err); } };
     const stopCamera = () => { if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); videoStream = null; } };
-    const takePhoto = () => { elements.takePhotoBtn.disabled = true; elements.overlaySpinner.style.display = 'flex'; const context = elements.photoCanvas.getContext('2d'); elements.photoCanvas.width = elements.cameraFeed.videoWidth; elements.photoCanvas.height = elements.cameraFeed.videoHeight; context.save(); context.translate(elements.photoCanvas.width, 0); context.scale(-1, 1); context.drawImage(elements.cameraFeed, 0, 0, elements.photoCanvas.width, elements.photoCanvas.height); context.restore(); stopCamera(); setTimeout(processAnalysis, 3000); }; // Aumenté un poco el tiempo de "análisis" para realismo
+    const takePhoto = () => { elements.takePhotoBtn.disabled = true; elements.overlaySpinner.style.display = 'flex'; const context = elements.photoCanvas.getContext('2d'); elements.photoCanvas.width = elements.cameraFeed.videoWidth; elements.photoCanvas.height = elements.cameraFeed.videoHeight; context.save(); context.translate(elements.photoCanvas.width, 0); context.scale(-1, 1); context.drawImage(elements.cameraFeed, 0, 0, elements.photoCanvas.width, elements.photoCanvas.height); context.restore(); stopCamera(); setTimeout(processAnalysis, 3000); };
     const processAnalysis = async () => { const analysisData = generateResults(); await saveAnalysisToFirestore(analysisData); displayResults(analysisData); elements.analysisSection.style.display = 'none'; elements.resultsSection.style.display = 'block'; };
     const saveAnalysisToFirestore = async (analysisData) => { if (!db || !userId) return; try { await addDoc(collection(db, 'analyses'), { userId, name: userName, email: userEmail, date: new Date(), ...analysisData }); } catch (error) { console.error("Error guardado DB:", error); } };
     document.addEventListener('DOMContentLoaded', () => { initFirebase(); elements.userInfoForm.addEventListener('submit', (e) => { e.preventDefault(); userName = elements.userNameInput.value.trim(); userEmail = elements.userEmailInput.value.trim(); if (userName && userEmail) startCamera(); }); elements.takePhotoBtn.addEventListener('click', takePhoto); });
