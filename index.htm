@@ -23,44 +23,40 @@
         -moz-osx-font-smoothing: grayscale;
       }
       
-      /* --- ESTILOS DEL VIDEO HEADER ACTUALIZADOS --- */
+      /* --- NUEVOS ESTILOS DEL HEADER (VIDEO INTERACTIVO) --- */
       header {
-          position: relative;
           width: 100%;
-          height: 300px; /* Altura controlada para escritorio */
-          overflow: hidden;
+          height: auto; /* Se adapta al contenido */
+          padding: 2rem 1rem 3rem 1rem; /* Espaciado interno */
           background-color: var(--color-salmon-rosa);
-      }
-      
-      #hero-video {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover; /* Clave: adapta el video sin deformarlo */
-          z-index: 0;
-          opacity: 0.9; /* Ligera transparencia para que se funda bien */
-      }
-
-      .header-overlay {
-          position: relative;
-          z-index: 1;
-          height: 100%;
           display: flex;
+          flex-direction: column; /* Apila título y video verticalmente */
           align-items: center;
           justify-content: center;
-          background: rgba(252, 226, 232, 0.2); /* Filtro sutil rosado */
+          text-align: center;
       }
       
       .header-title {
-          font-size: 4rem;
+          font-size: 3.5rem;
           font-weight: 900;
           letter-spacing: 0.5rem;
           color: #fff;
-          text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+          text-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Sombra suave para que se lea sobre el rosa */
+          margin-bottom: 1.5rem; /* Espacio entre título y video */
+          line-height: 1.1;
       }
-      /* --------------------------------------------- */
+
+      #hero-video {
+          position: relative;
+          width: 100%;
+          max-width: 700px; /* Ancho máximo para que no sea gigante en PC */
+          height: auto; /* Mantiene la proporción original del video */
+          border-radius: 1rem; /* Bordes redondeados estéticos */
+          box-shadow: 0 15px 30px rgba(0,0,0,0.15); /* Sombra para darle profundidad (efecto flotante) */
+          outline: none;
+          background-color: #000; /* Fondo negro mientras carga */
+      }
+      /* ---------------------------------------------------- */
 
       .btn-primary {
         background-color: var(--color-salmon-fuerte);
@@ -120,10 +116,12 @@
         color: var(--color-salmon-fuerte);
       }
       
-      /* Ajustes responsive para el header de video */
+      /* Ajustes responsive para el header */
       @media (max-width: 768px) {
-          header { height: 200px; /* Altura reducida en móviles */ }
-          .header-title { font-size: 2.5rem; }
+          .header-title { font-size: 2.5rem; letter-spacing: 0.2rem; }
+          header { padding-bottom: 2rem; }
+          /* El video ocupará casi todo el ancho en celular */
+          #hero-video { max-width: 95%; } 
       }
     </style>
 </head>
@@ -131,13 +129,12 @@
 <body class="antialiased">
 
 <header>
-    <video id="hero-video" autoplay loop muted playsinline>
+    <h1 class="header-title">NUKLEIA</h1>
+    
+    <video id="hero-video" controls autoplay loop muted playsinline>
         <source src="nukleiapresentacion.mp4" type="video/mp4">
         Tu navegador no soporta videos HTML5.
     </video>
-    <div class="header-overlay">
-        <h1 class="header-title">NUKLEIA</h1>
-    </div>
 </header>
 
 <main class="container mx-auto p-4 md:p-12">
@@ -153,11 +150,21 @@
                 <div class="advice-card"><i class="fas fa-face-meh fa-3x mb-4 advice-icon"></i><h4 class="font-bold text-lg">Expresión Neutra</h4><p class="text-sm text-gray-600 mt-2">Mantén un rostro relajado, sin sonreír ni fruncir el ceño.</p></div>
             </div>
         </div>
+
         <form id="user-info-form" class="mt-16 flex flex-col items-center">
             <p id="firebase-warning" class="text-red-600 text-center mb-4 font-semibold hidden p-3 border-2 border-red-200 bg-red-50 rounded-lg w-full max-w-md">⚠ La base de datos no está conectada.</p>
             <h4 class="text-2xl font-light mb-6">Comienza tu Análisis Gratuito</h4>
-            <div class="mb-4 w-full max-w-sm"><label for="name" class="block text-gray-700 font-semibold mb-2">Nombre</label><input type="text" id="name" name="name" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f9b6c1]"></div>
-            <div class="mb-6 w-full max-w-sm"><label for="email" class="block text-gray-700 font-semibold mb-2">Email</label><input type="email" id="email" name="email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f9b6c1]"></div>
+            
+            <div class="mb-4 w-full max-w-sm">
+                <label for="name" class="block text-gray-700 font-semibold mb-2">Nombre y Apellido</label>
+                <input type="text" id="name" name="name" required placeholder="Ej: María Gomez" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f9b6c1]">
+            </div>
+
+            <div class="mb-6 w-full max-w-sm">
+                <label for="email" class="block text-gray-700 font-semibold mb-2">Email</label>
+                <input type="email" id="email" name="email" required placeholder="tu@email.com" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f9b6c1]">
+            </div>
+            
             <button type="submit" class="mt-4 btn-primary w-full max-w-xs">HACER MI ESCANEO GRATUITO</button>
         </form>
     </section>
@@ -240,7 +247,7 @@
     };
     
     // ==============================================================================
-    // === NUEVA IA DE ANÁLISIS DINÁMICA (SIMULADA) ===
+    // === IA DE ANÁLISIS (SIMULADA) ===
     // ==============================================================================
     const generateResults = () => {
         const diagnosisOptions = {
@@ -300,9 +307,7 @@
         if (recommendedTreatments.size === 0) recommendedTreatments.add('Hidrodermoabrasión');
 
         const finalTreatmentsList = Array.from(recommendedTreatments).slice(0, 4);
-
         const referenceImageUrl = "https://placehold.co/600x400/f9b6c1/ffffff?text=Analisis+Completado";
-
         return { results, tratamientosSugeridos, recommendedTreatments: finalTreatmentsList, referenceImageUrl };
     };
 
